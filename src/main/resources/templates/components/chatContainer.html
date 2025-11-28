@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="chat" class="d-flex flex-column flex-grow-1">
+
+    <!-- Header -->
+    <div class="border-bottom p-3">
+        <h5 class="m-0">
+            Đang trò chuyện với:
+            <span th:text="${selectedUser}"></span>
+        </h5>
+    </div>
+
+    <!-- Body -->
+    <div class="flex-grow-1 overflow-auto p-3">
+        <!-- Tin nhắn tại đây -->
+    </div>
+
+    <!-- Footer -->
+    <div class="border-top p-3">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Nhập tin nhắn..." />
+            <button class="btn btn-primary">Gửi</button>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

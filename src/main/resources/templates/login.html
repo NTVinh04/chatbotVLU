@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
 
     <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
-    <title>Chatbot - Đăng Nhập</title>
+    <title>Đăng Nhập</title>
 
     <style>
         /* Khai báo biến CSS từ style.css */
@@ -74,7 +74,7 @@
             text-transform: capitalize;
             letter-spacing: 0.09em;
             color: white;
-            background-color: var(--black-color);
+            background-color: #D72134;
             border: 1px solid transparent;
             padding: 0.8rem 2.625rem;
             font-size: 1rem;
@@ -84,8 +84,8 @@
         }
         .btn-custom-submit:hover {
             background-color: var(--white-color);
-            color: black;
-            border: 1px solid black;
+            color: #D72134;
+            border: 1px solid #D72134;
         }
 
         /* Input Group cho Email */
@@ -114,7 +114,7 @@
             transition: background-color 0.3s ease;
         }
         .input-group .input-group-text:hover {
-            background-color: black;
+            background-color: #D72134;
             color: #ffffff;
         }
         .input-group:focus-within .input-group-text {
@@ -134,66 +134,73 @@
     </style>
 </head>
 <body>
+<div class="container d-flex flex-column align-items-center" style="min-height: 100vh; justify-content: center;">
 
-<div>
-    <img th:src="@{/images/VLU.png}" alt="VLU" class="text-center" style="height: 50%, width: 50%">
-</div>
-
-<div class="login-wrapper">
-
-    <h2 class="text-center">Đăng Nhập Tài Khoản</h2>
-
-    <div th:if="${error}" class="alert alert-danger text-center" role="alert">
-        <span th:text="${error}"></span>
-    </div>
-    <div th:if="${success}" class="alert alert-success text-center" role="alert">
-        <span th:text="${success}"></span>
+    <!-- PHẦN ẢNH TRÊN -->
+    <div class="mb-4 text-center">
+        <img th:src="@{/images/VLU.png}" alt="VLU" style="height: 50%; width: 50%;">
     </div>
 
-    <form th:action="@{/user/signin}" method="POST" id="loginForm">
+    <!-- PHẦN LOGIN DƯỚI -->
+    <div class="login-wrapper" style="width: 100%; max-width: 420px;">
 
-        <div class="mb-3">
-            <label for="emailPrefix" class="form-label small fw-medium text-uppercase">Email</label>
-            <div class="input-group">
-                <input
-                        type="text"
-                        id="emailPrefix"
-                        name="emailPrefix"  placeholder="Tên tài khoản Gmail"
-                        class="form-control"
-                        required
-                />
-                <span class="input-group-text p-3" style="border-radius: 0 200px 200px 0; border-left: none;">
-                    @gmail.com
-                </span>
+        <h2 class="text-center">Đăng Nhập Tài Khoản</h2>
+
+        <div th:if="${error}" class="alert alert-danger text-center" role="alert">
+            <span th:text="${error}"></span>
+        </div>
+        <div th:if="${success}" class="alert alert-success text-center" role="alert">
+            <span th:text="${success}"></span>
+        </div>
+
+        <form th:action="@{/user/signin}" method="POST" id="loginForm">
+
+            <div class="mb-3">
+                <label for="emailPrefix" class="form-label small fw-medium text-uppercase">VLU mail</label>
+                <div class="input-group">
+                    <input
+                            type="text"
+                            id="emailPrefix"
+                            name="emailPrefix"
+                            placeholder="Tài khoản VLU"
+                            class="form-control"
+                            required
+                    />
+                    <span class="input-group-text p-3" style="border-radius: 0 200px 200px 0; border-left: none;">
+                        @vanlanguni.vn
+                    </span>
+                </div>
+                <input type="hidden" id="fullEmail" name="email" value="">
             </div>
-            <input type="hidden" id="fullEmail" name="email" value="">
-        </div>
 
-        <div class="mb-3">
-            <label for="password" class="form-label small fw-medium text-uppercase">Mật khẩu</label>
-            <div class="input-group">
-                <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
-                        class="form-control"
-                        minlength="6"
-                        required
-                />
-                <span class="input-group-text" id="togglePassword">
-                    <i class="fa fa-eye-slash" aria-hidden="true"></i>
-                </span>
+            <div class="mb-3">
+                <label for="password" class="form-label small fw-medium text-uppercase">Mật khẩu</label>
+                <div class="input-group">
+                    <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+                            class="form-control"
+                            minlength="6"
+                            required
+                    />
+                    <span class="input-group-text" id="togglePassword">
+                        <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                    </span>
+                </div>
             </div>
-        </div>
 
-        <div class="text-end mb-4">
-            <a th:href="@{/forgot-password}" class="text-decoration-underline small link-secondary">Quên mật khẩu?</a>
-        </div>
+            <div class="text-end mb-4">
+                <a th:href="@{/forgot-password}" class="text-decoration-underline small link-secondary">Quên mật khẩu?</a>
+            </div>
 
-        <button type="submit" class="w-100 btn btn-custom-submit mb-3">Đăng nhập</button>
-    </form>
+            <button type="submit" class="w-100 btn btn-custom-submit mb-3">Đăng nhập</button>
+        </form>
+    </div>
 </div>
+</body>
+
 
 <script>
     // Xử lý ẩn/hiện mật khẩu
@@ -227,7 +234,7 @@
         }
 
         // Gán email hoàn chỉnh vào trường ẩn 'email' (name="email")
-        fullEmailInput.value = prefixValue + "@gmail.com";
+        fullEmailInput.value = prefixValue + "@vanlanguni.vn";
 
         // Form sẽ submit với name="email" chứa giá trị hợp lệ cho Controller
     });

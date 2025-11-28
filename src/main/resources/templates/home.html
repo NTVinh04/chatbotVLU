@@ -1,12 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Chat</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 </head>
-<body>
-    <div>
-        <h2 class="text-center">Đăng nhập</h2>
+<body class="bg-light" style="height: 100vh;">
+
+<div class="container-fluid h-100">
+
+    <div class="row justify-content-center pt-5 px-3 h-100">
+
+        <div class="col-12 col-lg-10 bg-white rounded shadow p-0"
+             style="height: calc(100vh - 8rem);">
+
+            <div class="d-flex h-100">
+
+                <!-- Sidebar -->
+                <div th:replace="~{components/sidebar :: sidebar}"></div>
+
+                <!-- Không có user được chọn -->
+                <div th:if="${selectedUser == null}"
+                     th:replace="~{components/noChatSelected :: noChat}">
+                </div>
+
+                <!-- Đã chọn user -->
+                <div th:if="${selectedUser != null}"
+                     th:replace="~{components/chatContainer :: chat}">
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
+
+</div>
+
 </body>
 </html>
