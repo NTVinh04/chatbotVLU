@@ -9,10 +9,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        0,
-        0
+        -192,
+        -16
       ],
-      "id": "73217d13-f7bc-4f3c-88f3-b41384716a7e",
+      "id": "67ea03d0-8d21-4239-b8bc-951d3178e1a6",
       "name": "Webhook",
       "webhookId": "52b9988d-9d1e-4c64-832b-6d505e3f3b1e"
     },
@@ -25,7 +25,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer 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"
+              "value": "Bearer API KEY"
             },
             {
               "name": "Content-Type",
@@ -49,11 +49,38 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        208,
-        0
+        16,
+        -16
       ],
-      "id": "386cacfb-d126-49d4-94ae-381c82fbd991",
-      "name": "HTTP Request"
+      "id": "8b66adca-9bcc-4676-8e09-89d9301e7c93",
+      "name": "HTTP Request",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        -192
+      ],
+      "id": "8b30f3f3-5b02-415b-9d51-1cdada5ee7ca",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"error\": true,\n  \"message\": \"Thông tin không hợp lệ\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        16,
+        -192
+      ],
+      "id": "2cc21f20-c69a-4eaf-b5df-5b074bc8f9bd",
+      "name": "Respond to Webhook"
     }
   ],
   "connections": {
@@ -67,11 +94,21 @@
           }
         ]
       ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "pinData": {},
   "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "941d1cd3fbcf3ae0a5b44c0d386646832139e688803f2b4fb56ed4e54751cb10"
+    "instanceId": "fe592d97760b30915ddde711d60e9a8ed69094554c2d8212edb422f325f8845c"
   }
 }
