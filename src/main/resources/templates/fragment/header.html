@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Header Fragment</title>
+</head>
+<body>
+
+<div th:fragment="header_content">
+    <!--icon-->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="user" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="currentColor" fill-rule="evenodd"
+                  d="M12 1.25a4.75 4.75 0 1 0 0 9.5a4.75 4.75 0 0 0 0-9.5M8.75 6a3.25 3.25 0 1 1 6.5 0a3.25 3.25 0 0 1-6.5 0M12 12.25c-2.313 0-4.445.526-6.024 1.414C4.42 14.54 3.25 15.866 3.25 17.5v.102c-.001 1.162-.002 2.62 1.277 3.662c.629.512 1.51.877 2.7 1.117c1.192.242 2.747.369 4.773.369s3.58-.127 4.774-.369c1.19-.24 2.07-.605 2.7-1.117c1.279-1.042 1.277-2.5 1.276-3.662V17.5c0-1.634-1.17-2.96-2.725-3.836c-1.58-.888-3.711-1.414-6.025-1.414M4.75 17.5c0-.851.622-1.775 1.961-2.528c1.316-.74 3.184-1.222 5.29-1.222c2.104 0 3.972.482 5.288 1.222c1.34.753 1.961 1.677 1.961 2.528c0 1.308-.04 2.044-.724 2.6c-.37.302-.99.597-2.05.811c-1.057.214-2.502.339-4.476.339c-1.974 0-3.42-.125-4.476-.339c-1.06-.214-1.68-.509-2.05-.81c-.684-.557-.724-1.293-.724-2.601"
+                  clip-rule="evenodd" />
+        </symbol>
+
+        <symbol xmlns="http://www.w3.org/2000/svg" id="nav-icon" viewBox="0 0 16 16">
+            <path
+                    d="M14 10.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 .5-.5zm0-3a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0 0 1h7a.5.5 0 0 0 .5-.5zm0-3a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0 0 1h11a.5.5 0 0 0 .5-.5z" />
+        </symbol>
+        <symbol xmlns="http://www.w3.org/2000/svg" id="close" viewBox="0 0 16 16">
+            <path
+                    d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z" />
+        </symbol>
+        <symbol xmlns="http://www.w3.org/2000/svg" id="navbar-icon" viewBox="0 0 16 16">
+            <path
+                    d="M14 10.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 .5-.5zm0-3a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0 0 1h7a.5.5 0 0 0 .5-.5zm0-3a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0 0 1h11a.5.5 0 0 0 .5-.5z" />
+        </symbol>
+    </svg>
+
+    <header id="header" class="site-header">
+        <nav id="header-nav" class="navbar navbar-expand-lg py-3">
+            <div class="container">
+                <a class="navbar-brand" th:href="@{/home}">
+                    <img th:src="@{/images/VLU.png}" class="logo" style="width: 240px; height: 60px;">
+                </a>
+                <button class="navbar-toggler d-flex d-lg-none order-3 p-2" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#bdNavbar" aria-controls="bdNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <svg class="navbar-icon">
+                        <use xlink:href="#navbar-icon"></use>
+                    </svg>
+                </button>
+                <div class="offcanvas offcanvas-end" tabindex="-1" id="bdNavbar" aria-labelledby="bdNavbarOffcanvasLabel">
+                    <div class="offcanvas-header px-4 pb-0">
+                        <a class="navbar-brand" th:href="@{/home}">
+                            <img th:src="@{/images/VLU.png}" class="logo">
+                        </a>
+                        <button type="button" class="btn-close btn-close-black" data-bs-dismiss="offcanvas" aria-label="Close"
+                                data-bs-target="#bdNavbar"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <div class="user-items d-flex">
+                            <ul class="d-flex justify-content-end list-unstyled mb-0">
+                                <!------------------------------ account -->
+                                <li class="pe-3">
+                                    <div th:if="${session.loggedInUser}" class="dropdown">
+                                        <a th:href="@{/user/profile}"
+                                           class="account-button d-flex align-items-center dropdown-toggle"
+                                           data-bs-toggle="dropdown" role="button" aria-expanded="false">
+
+                                            <img th:src="@{'/user/avatar/' + ${session.loggedInUser.id}}"
+                                                 alt="User Avatar"
+                                                 class="user-avatar me-2 rounded-circle"
+                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" />
+
+                                            <svg class="user-icon me-2" width="24" height="24" style="display:none;">
+                                                <use xlink:href="#user"></use>
+                                            </svg>
+
+                                            <span class="fw-bold" th:text="${session.loggedInUser.firstName}">Tên User</span>
+                                        </a>
+
+                                        <div class="dropdown-menu user-menu animate slide dropdown-menu-start dropdown-menu-lg-end p-2">
+                                            <a th:href="@{/user/profile}" class="dropdown-item fw-medium">Thông tin cá nhân</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a th:href="@{/user/logout}" class="dropdown-item text-danger fw-medium">Đăng xuất</a>
+                                        </div>
+                                    </div>
+
+                                    <div th:unless="${session.loggedInUser}">
+                                        <a class="account-button" th:href="@{/user/signin}">
+                                            <svg class="user-icon" width="24" height="24">
+                                                <use xlink:href="#user"></use>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+</div>
+</body>
+</html>
