@@ -6,16 +6,11 @@
     <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-
-    <!-- CSS của bạn phải nằm dưới -->
     <link rel="stylesheet" href="/custom.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-
 </head>
 
-
-<body class="bg-light">
+<body>
 
 <!-- Header -->
 <div th:replace="fragment/header :: header_content"></div>
@@ -23,30 +18,35 @@
 <!-- Shadow box ngăn cách header và body -->
 <div class="w-100" style="height: 5px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);"></div>
 
-<div class="container-fluid h-100">
-    <div class="row justify-content-center pt-3 px-3 h-100">
-        <div class="col-12 col-lg-12 bg-white rounded shadow p-0"
-             style="height: calc(100vh - 8rem);">
-            <div class="d-flex h-100">
-                <!-- Sidebar -->
-                <div th:replace="~{components/sidebar :: sidebar}"></div>
+<!-- Main Content -->
+<div class="main-content">
+    <div class="container-fluid h-100 px-3 py-3">
+        <div class="row justify-content-center h-100">
+            <div class="col-12 bg-white rounded shadow p-0 h-100">
+                <div class="d-flex h-100">
+                    <!-- Sidebar -->
+                    <div th:replace="~{components/sidebar :: sidebar}"></div>
 
-<!--                &lt;!&ndash; Không có user được chọn &ndash;&gt;-->
-<!--                                    <div th:if="${selectedUser == null}"-->
-<!--                                         th:replace="~{components/noChatSelected :: noChat}">-->
-<!--                                    </div>-->
-
-                <!-- Đã chọn user -->
-                <div th:if="${selectedUser != null}"
-                     th:replace="~{components/chatContainer :: chat}">
+                    <!-- Đã chọn user -->
+                    <div th:if="${selectedUser != null}"
+                         th:replace="~{components/chatContainer :: chat}">
+                    </div>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
-<div th:replace="fragment/footer :: footer_content"></div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
 
+<!-- Footer -->
+<div th:replace="fragment/footer :: footer_content"></div>
+
+<!-- Scripts - Đặt ở cuối body -->
+<script th:src="@{/js/jquery-1.11.0.min.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+<script type="text/javascript" th:src="@{/js/script.js}"></script>
+
+</body>
 </html>

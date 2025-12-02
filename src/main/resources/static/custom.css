@@ -18,3 +18,190 @@
 .bg-primary {
     background-color: #D72134 !important;
 }
+
+/* Reset mặc định */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Shadow box */
+.w-100[style*="box-shadow"] {
+    flex-shrink: 0;
+}
+
+/* Main content - Tính toán chiều cao cụ thể */
+.main-content {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 350px);
+}
+
+.main-content .container-fluid {
+    height: 100%;
+    padding: 1rem;
+}
+
+.main-content .row {
+    height: 100%;
+    margin: 0;
+}
+
+.main-content .col-12 {
+    height: 100%;
+    min-height: 500px;
+}
+
+/* Chat container cụ thể */
+.main-content .bg-white.rounded.shadow {
+    min-height: 600px;
+    height: 100%;
+}
+
+/* Footer styles - Loại bỏ hoàn toàn khoảng trắng thừa */
+#footer {
+    flex-shrink: 0;
+    background-color: #f8f9fa;
+    padding: 2rem 0 0.5rem 0 !important;
+    margin: 0 !important;
+}
+
+#footer .footer-top-area {
+    padding-bottom: 0.5rem;
+}
+
+#footer .footer-menu p {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+#footer .widget-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+#footer .menu-list {
+    margin-bottom: 0;
+    padding-left: 0;
+}
+
+#footer .menu-list .menu-item {
+    margin-bottom: 0.5rem;
+}
+
+#footer .menu-list .menu-item:last-child {
+    margin-bottom: 0;
+}
+
+#footer .social-links ul {
+    gap: 0.5rem;
+    margin-top: 1rem;
+    margin-bottom: 0;
+    padding-left: 0;
+}
+
+#footer .contact-item p {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+#footer .contact-item p:last-child {
+    margin-bottom: 0;
+}
+
+/* Loại bỏ padding bottom của các columns */
+#footer .pb-3 {
+    padding-bottom: 0.5rem !important;
+}
+
+#footer .col-lg-3:last-child,
+#footer .col-sm-6:last-child {
+    padding-bottom: 0 !important;
+}
+
+/* Đảm bảo không có margin/padding thừa */
+#footer .container {
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+#footer .row {
+    margin-bottom: 0;
+}
+
+/* Loại bỏ khoảng trắng từ wrapper div của Thymeleaf */
+body > div:last-of-type {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* Loại bỏ khoảng trắng từ các thẻ script */
+body > script {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Đảm bảo không có pseudo-element tạo space */
+body::after,
+#footer::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* Fix responsive */
+@media (max-width: 1199px) {
+    .main-content {
+        min-height: calc(100vh - 400px);
+    }
+}
+
+@media (max-width: 767px) {
+    .main-content {
+        min-height: calc(100vh - 450px);
+    }
+
+    .main-content .col-12 {
+        min-height: 400px;
+    }
+
+    #footer {
+        padding: 1.5rem 0 0.5rem 0 !important;
+    }
+
+    #footer .footer-menu p {
+        font-size: 0.85rem;
+    }
+}
+
+/* Debug - Bỏ comment nếu vẫn còn vấn đề để xem element nào gây ra */
+/*
+body * {
+    outline: 1px solid rgba(255, 0, 0, 0.2);
+}
+
+#footer {
+    background-color: yellow !important;
+}
+*/
