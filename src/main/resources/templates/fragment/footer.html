@@ -2,12 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
-    <title>Header Fragment</title>
+    <title>footer Fragment</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
-<div th:fragment="header_content">
+<div th:fragment="footer_content">
     <!-- SVG icons chỉ giữ những icon được sử dụng -->
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
         <symbol id="user" viewBox="0 0 24 24">
@@ -21,7 +21,7 @@
         </symbol>
     </svg>
 
-    <header id="header" class="site-header">
+    <footer id="footer" class="site-footer">
         <nav class="navbar navbar-expand-lg py-3 bg-light">
             <div class="container">
                 <!-- LOGO -->
@@ -75,7 +75,7 @@
                 <!-- OFFCANVAS MENU (MOBILE ONLY) -->
                 <div class="offcanvas offcanvas-end d-lg-none" tabindex="-1" id="bdNavbar">
 
-                    <div class="offcanvas-header px-4 pb-0">
+                    <div class="offcanvas-footer px-4 pb-0">
                         <a class="navbar-brand" href="/home">
                             <img src="/images/VLU.png" class="logo" alt="logo" style="width: 200px;">
                         </a>
@@ -112,7 +112,7 @@
 
             </div>
         </nav>
-    </header>
+    </footer>
 </div>
 </body>
 </html>
