@@ -1,39 +1,30 @@
+/* =====================================================
+   BIẾN TOÀN CỤC VÀ RESET
+   ===================================================== */
+
+/* Định nghĩa màu chủ đạo của ứng dụng */
 :root {
     --bs-primary: #D72134 !important;
     --bs-primary-rgb: 215, 33, 52 !important;
 }
 
-.btn-primary {
-    background-color: #D72134 !important;
-    border-color: #D72134 !important;
-}
-
-.btn-primary:hover,
-.btn-primary:focus {
-    background-color: white !important;
-    color: #D72134 !important;
-    border-color: #D72134 !important;
-}
-
-.bg-primary {
-    background-color: #D72134 !important;
-}
-
-/* Reset mặc định */
+/* Reset các thuộc tính mặc định của trình duyệt */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Thiết lập toàn bộ trang chiếm 100% chiều cao và rộng */
 html, body {
     height: 100%;
     width: 100%;
     margin: 0 !important;
     padding: 0 !important;
-    overflow-x: hidden;
+    overflow-x: hidden; /* Ngăn scroll ngang */
 }
 
+/* Body sử dụng flexbox để footer luôn ở dưới cùng */
 body {
     display: flex;
     flex-direction: column;
@@ -41,58 +32,402 @@ body {
     min-height: 100vh;
 }
 
-/* Shadow box */
+/* Loại bỏ khoảng trắng từ các thẻ script và wrapper div */
+body > div:last-of-type {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+body > script {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Đảm bảo không có pseudo-element tạo space thừa */
+body::after {
+    content: none !important;
+    display: none !important;
+}
+
+
+/* =====================================================
+   BUTTONS VÀ COMPONENTS CHUNG
+   ===================================================== */
+
+/* Nút primary với màu đỏ chủ đạo */
+.btn-primary {
+    background-color: #D72134 !important;
+    border-color: #D72134 !important;
+}
+
+/* Hiệu ứng hover/focus cho nút primary - đảo màu */
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: white !important;
+    color: #D72134 !important;
+    border-color: #D72134 !important;
+}
+
+/* Background màu primary */
+.bg-primary {
+    background-color: #D72134 !important;
+}
+
+/* Shadow box - giữ kích thước cố định */
 .w-100[style*="box-shadow"] {
     flex-shrink: 0;
 }
 
-/* Main content - Tính toán chiều cao cụ thể */
+
+/* =====================================================
+   HEADER STYLES
+   ===================================================== */
+
+/* ===== DESKTOP HEADER ICONS ===== */
+
+/* Icon trên header desktop - màu đen mặc định */
+.header-icon-link {
+    color: #000000 !important;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+/* Hover icon header - chuyển sang màu đỏ */
+.header-icon-link:hover {
+    color: #D72134 !important;
+}
+
+/* Icon bên trong link - màu đen */
+.header-icon-link i,
+.header-icon-link svg {
+    color: #000000;
+    transition: color 0.3s ease;
+}
+
+/* Hover icon - chuyển sang màu đỏ */
+.header-icon-link:hover i,
+.header-icon-link:hover svg {
+    color: #D72134;
+}
+
+/* ===== USER DROPDOWN (DESKTOP) ===== */
+
+/* Nút account trên desktop - màu đen */
+.d-none.d-lg-flex .dropdown .account-button {
+    color: #000000;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+/* Hover nút account - màu đỏ */
+.d-none.d-lg-flex .dropdown .account-button:hover {
+    color: #D72134;
+}
+
+/* Text trong nút account */
+.d-none.d-lg-flex .dropdown .account-button span {
+    color: #000000;
+    transition: color 0.3s ease;
+}
+
+.d-none.d-lg-flex .dropdown .account-button:hover span {
+    color: #D72134;
+}
+
+/* ===== MOBILE OFFCANVAS MENU ===== */
+
+/* Link trong offcanvas mobile - màu đen */
+.offcanvas-link {
+    color: #000000 !important;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+/* Hover link offcanvas - màu đỏ */
+.offcanvas-link:hover {
+    color: #D72134 !important;
+}
+
+/* Icon và text trong offcanvas */
+.offcanvas-link i,
+.offcanvas-link svg,
+.offcanvas-link span {
+    color: #000000;
+    transition: color 0.3s ease;
+}
+
+.offcanvas-link:hover i,
+.offcanvas-link:hover svg,
+.offcanvas-link:hover span {
+    color: #D72134;
+}
+
+/* Avatar không đổi màu khi hover */
+.account-button img.rounded-circle,
+.offcanvas-link img.rounded-circle {
+    transition: none;
+}
+
+/* ===== DROPDOWN MENU ITEMS ===== */
+
+/* Item trong dropdown menu */
+.dropdown-menu .dropdown-item {
+    color: #000000;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Hover dropdown item */
+.dropdown-menu .dropdown-item:hover {
+    color: #D72134;
+    background-color: #fdeaec;
+}
+
+/* Item đăng xuất - màu đỏ */
+.dropdown-menu .dropdown-item.text-danger {
+    color: #D72134 !important;
+}
+
+.dropdown-menu .dropdown-item.text-danger:hover {
+    color: #c11d2e !important;
+    background-color: #fdeaec;
+}
+
+
+/* =====================================================
+   MAIN CONTENT AREA - CHAT SECTION
+   ===================================================== */
+
+/* ===== MAIN CONTENT CONTAINER ===== */
+
+/* Main content chiếm toàn bộ không gian còn lại giữa header và footer */
 .main-content {
-    flex: 1 0 auto;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
-    min-height: calc(100vh - 350px);
+    overflow: hidden; /* Ngăn overflow ra ngoài */
 }
 
+/* Container fluid bên trong main content */
 .main-content .container-fluid {
-    height: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     padding: 1rem;
+    overflow: hidden;
 }
 
+/* Row chứa chat */
 .main-content .row {
-    height: 100%;
+    flex: 1;
     margin: 0;
+    overflow: hidden;
 }
 
+/* Column chứa chat box */
 .main-content .col-12 {
+    display: flex;
+    flex-direction: column;
     height: 100%;
-    min-height: 500px;
+    overflow: hidden;
 }
 
-/* Chat container cụ thể */
+/* Container chính chứa sidebar + chat area */
 .main-content .bg-white.rounded.shadow {
-    min-height: 600px;
-    height: 100%;
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    min-height: 0; /* Cho phép flex shrink */
 }
 
-/* Footer styles - Loại bỏ hoàn toàn khoảng trắng thừa */
-#footer {
+/* Wrapper d-flex bên trong */
+.main-content .d-flex.h-100 {
+    flex: 1;
+    overflow: hidden;
+    height: 100% !important;
+}
+
+/* ===== CHAT CONTAINER LAYOUT ===== */
+
+/* Chat container chính - flex column layout */
+.d-flex.flex-column.flex-grow-1 {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* Header của chat - cố định ở trên */
+.d-flex.flex-column.flex-grow-1 > .border-bottom {
     flex-shrink: 0;
+}
+
+/* Body của chat - phần tin nhắn có scroll */
+.d-flex.flex-column.flex-grow-1 > .flex-grow-1.overflow-auto {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+}
+
+/* Footer của chat - input message cố định ở dưới */
+.d-flex.flex-column.flex-grow-1 > .border-top {
+    flex-shrink: 0;
+}
+
+/* ===== SIDEBAR CHAT (USER LIST) ===== */
+
+/* Nút toggle sidebar cho mobile - nút tròn màu đỏ */
+.sidebar-toggle-btn {
+    position: fixed;
+    top: 80px;
+    left: 10px;
+    z-index: 1000;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    background-color: #D72134;
+    border-color: #D72134;
+    color: white;
+}
+
+/* Hiệu ứng hover cho nút toggle */
+.sidebar-toggle-btn:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+    background-color: #c11d2e;
+    border-color: #c11d2e;
+}
+
+/* Offcanvas sidebar cho mobile */
+#chatSidebar {
+    width: 280px;
+}
+
+/* Sidebar desktop */
+.sidebar-desktop {
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* ===== USER LIST ITEMS (CHUNG CHO DESKTOP & MOBILE) ===== */
+
+/* List item trong sidebar - styling chung */
+.sidebar-desktop .list-group-item,
+#chatSidebar .list-group-item {
+    cursor: pointer;
+    border-left: 3px solid transparent; /* Border trái để highlight */
+    transition: all 0.2s ease;
+    border-radius: 0;
+}
+
+/* Hover user item - hiển thị border màu đỏ */
+.sidebar-desktop .list-group-item:hover,
+#chatSidebar .list-group-item:hover {
+    background-color: #f8f9fa;
+    border-left-color: #D72134;
+}
+
+/* User item đang active - background hồng nhạt */
+.sidebar-desktop .list-group-item.active,
+#chatSidebar .list-group-item.active {
+    background-color: #fdeaec;
+    border-left-color: #D72134;
+}
+
+/* Text tên user khi active - màu đỏ */
+.sidebar-desktop .list-group-item.active .fw-semibold,
+#chatSidebar .list-group-item.active .fw-semibold {
+    color: #D72134;
+}
+
+/* ===== AVATAR STYLING ===== */
+
+/* Avatar hình tròn trong list */
+.list-group-item img.rounded-circle {
+    object-fit: cover;
+    border: 2px solid #e9ecef;
+}
+
+/* Border avatar khi hover - chuyển màu đỏ */
+.list-group-item:hover img.rounded-circle {
+    border-color: #D72134;
+    transition: border-color 0.2s ease;
+}
+
+/* ===== TEXT TRUNCATE ===== */
+
+/* Tin nhắn cuối cùng - cắt bớt nếu quá dài */
+.list-group-item small.text-muted {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 180px;
+}
+
+
+/* =====================================================
+   FOOTER STYLES
+   ===================================================== */
+
+/* Footer chính - loại bỏ khoảng trắng thừa */
+#footer {
+    flex-shrink: 0; /* Giữ footer ở dưới cùng */
     background-color: #f8f9fa;
     padding: 2rem 0 0.5rem 0 !important;
     margin: 0 !important;
 }
 
+/* Đảm bảo không có pseudo-element tạo space */
+#footer::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* ===== FOOTER LAYOUT ===== */
+
+/* Footer top area */
 #footer .footer-top-area {
     padding-bottom: 0.5rem;
 }
 
+/* Container và row trong footer */
+#footer .container {
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+#footer .row {
+    margin-bottom: 0;
+}
+
+/* Loại bỏ padding bottom của columns */
+#footer .pb-3 {
+    padding-bottom: 0.5rem !important;
+}
+
+#footer .col-lg-3:last-child,
+#footer .col-sm-6:last-child {
+    padding-bottom: 0 !important;
+}
+
+/* ===== FOOTER CONTENT ===== */
+
+/* Text trong footer menu */
 #footer .footer-menu p {
     margin-bottom: 1rem;
     font-size: 0.9rem;
     line-height: 1.6;
 }
 
+/* Tiêu đề widget trong footer */
 #footer .widget-title {
     font-size: 1rem;
     font-weight: 600;
@@ -100,6 +435,7 @@ body {
     padding-bottom: 0.5rem;
 }
 
+/* Menu list trong footer */
 #footer .menu-list {
     margin-bottom: 0;
     padding-left: 0;
@@ -113,6 +449,9 @@ body {
     margin-bottom: 0;
 }
 
+/* ===== SOCIAL LINKS ===== */
+
+/* Danh sách social links */
 #footer .social-links ul {
     gap: 0.5rem;
     margin-top: 1rem;
@@ -120,6 +459,9 @@ body {
     padding-left: 0;
 }
 
+/* ===== CONTACT INFO ===== */
+
+/* Thông tin liên hệ */
 #footer .contact-item p {
     margin-bottom: 0.5rem;
     font-size: 0.9rem;
@@ -129,73 +471,80 @@ body {
     margin-bottom: 0;
 }
 
-/* Loại bỏ padding bottom của các columns */
-#footer .pb-3 {
-    padding-bottom: 0.5rem !important;
+
+/* =====================================================
+   RESPONSIVE STYLES
+   ===================================================== */
+
+/* ===== MOBILE DEVICES (max-width: 767px) ===== */
+@media (max-width: 767px) {
+    /* Main content tối thiểu */
+    .main-content {
+        min-height: calc(100vh - 450px);
+    }
+
+    /* Column trong main content */
+    .main-content .col-12 {
+        min-height: 400px;
+    }
+
+    /* Container fluid padding nhỏ hơn */
+    .main-content .container-fluid {
+        padding: 0.5rem;
+    }
+
+    /* Footer padding nhỏ hơn */
+    #footer {
+        padding: 1.5rem 0 0.5rem 0 !important;
+    }
+
+    /* Font size nhỏ hơn trong footer */
+    #footer .footer-menu p {
+        font-size: 0.85rem;
+    }
 }
 
-#footer .col-lg-3:last-child,
-#footer .col-sm-6:last-child {
-    padding-bottom: 0 !important;
+/* ===== TABLET DEVICES (768px - 991px) ===== */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    /* Nút toggle sidebar lớn hơn */
+    .sidebar-toggle-btn {
+        width: 50px;
+        height: 50px;
+        left: 15px;
+    }
+
+    /* Sidebar rộng hơn */
+    #chatSidebar {
+        width: 320px;
+    }
 }
 
-/* Đảm bảo không có margin/padding thừa */
-#footer .container {
-    padding-bottom: 0;
-    margin-bottom: 0;
+/* ===== MOBILE & TABLET (max-width: 991.98px) ===== */
+@media (max-width: 991.98px) {
+    /* Chuyển layout thành column cho mobile */
+    .main-content .d-flex.h-100 {
+        flex-direction: column;
+    }
+
+    /* Chat container full width */
+    .d-flex.flex-column.flex-grow-1 {
+        width: 100% !important;
+    }
 }
 
-#footer .row {
-    margin-bottom: 0;
-}
-
-/* Loại bỏ khoảng trắng từ wrapper div của Thymeleaf */
-body > div:last-of-type {
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
-}
-
-/* Loại bỏ khoảng trắng từ các thẻ script */
-body > script {
-    display: none !important;
-    height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* Đảm bảo không có pseudo-element tạo space */
-body::after,
-#footer::after {
-    content: none !important;
-    display: none !important;
-}
-
-/* Fix responsive */
+/* ===== DESKTOP MEDIUM (max-width: 1199px) ===== */
 @media (max-width: 1199px) {
     .main-content {
         min-height: calc(100vh - 400px);
     }
 }
 
-@media (max-width: 767px) {
-    .main-content {
-        min-height: calc(100vh - 450px);
-    }
 
-    .main-content .col-12 {
-        min-height: 400px;
-    }
+/* =====================================================
+   DEBUG STYLES (OPTIONAL - BỎ COMMENT KHI CẦN)
+   ===================================================== */
 
-    #footer {
-        padding: 1.5rem 0 0.5rem 0 !important;
-    }
-
-    #footer .footer-menu p {
-        font-size: 0.85rem;
-    }
-}
-
-/* Debug - Bỏ comment nếu vẫn còn vấn đề để xem element nào gây ra */
+/* Hiển thị outline để debug layout */
 /*
 body * {
     outline: 1px solid rgba(255, 0, 0, 0.2);

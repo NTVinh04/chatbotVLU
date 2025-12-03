@@ -36,12 +36,12 @@
                 <div class="d-none d-lg-flex align-items-center">
 
                     <!-- SETTING -->
-                    <a href="/setting" class="me-3">
-                        <i class="fa-solid fa-gear fs-4" style="color: #D72134"></i>
+                    <a href="/setting" class="me-3 header-icon-link">
+                        <i class="fa-solid fa-gear fs-4"></i>
                     </a>
 
                     <!-- USER -->
-                    <div th:if="${session.loggedInUser}" class="dropdown">
+                    <div class="dropdown">
                         <a href="#" class="account-button d-flex align-items-center dropdown-toggle"
                            data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="/images/user.png" style="width: 50px; height: 50px"
@@ -54,13 +54,6 @@
                             <li><a class="dropdown-item text-danger" href="#">Đăng xuất</a></li>
                         </ul>
                     </div>
-
-                    <div th:unless="${session.loggedInUser}">
-                        <a class="account-button" href="/user/signin" style="color: #D72134">
-                            <svg width="30" height="30"><use xlink:href="#user"></use></svg>
-                        </a>
-                    </div>
-
                 </div>
 
                 <!-- MOBILE TOGGLER -->
@@ -87,26 +80,18 @@
                         <!-- MOBILE ICONS -->
                         <div class="d-flex flex-column">
 
-                            <a href="/setting" class="mb-3" style="color: #D72134">
-                                <i class="fa-solid fa-gear fs-3" style="color: #D72134"></i> Cài đặt
+                            <a href="/setting" class="mb-3 offcanvas-link">
+                                <i class="fa-solid fa-gear fs-3"></i> Cài đặt
                             </a>
 
-                            <div th:if="${session.loggedInUser}">
-                                <a href="#" class="d-flex align-items-center mb-3">
+                            <div>
+                                <a href="#" class="d-flex align-items-center mb-3 offcanvas-link">
                                     <img src="/images/user.png" style="width: 50px; height: 50px"
                                          class="rounded-circle me-2">
                                     <span class="fw-bold">Test User</span>
                                 </a>
                             </div>
-
-                            <div th:unless="${session.loggedInUser}">
-                                <a class="account-button" href="/user/signin" style="color: #D72134">
-                                    <svg width="30" height="30" style="color: #D72134"><use xlink:href="#user"></use></svg> Đăng nhập
-                                </a>
-                            </div>
-
                         </div>
-
                     </div>
                 </div>
 

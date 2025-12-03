@@ -123,13 +123,13 @@
             z-index: 3;
         }
 
-        /* Link Quên mật khẩu/Đăng ký */
+        /* Link Quên mật khẩu */
         .link-secondary {
             color: var(--black-color) !important;
         }
         .link-secondary:hover {
-            background-color: rgba(0,0,0,0.1);
-            color: black;
+background-color: rgba(0,0,0,0.1);
+            color: #D72134  !important;
         }
     </style>
 </head>
@@ -219,7 +219,7 @@
         }
     });
 
-    // 🌟 LOGIC GỘP EMAIL TRƯỚC KHI ĐĂNG NHẬP 🌟
+    //  LOGIC GỘP EMAIL TRƯỚC KHI ĐĂNG NHẬP
     document.querySelector('form').addEventListener('submit', function (event) {
         const prefixInput = document.getElementById('emailPrefix');
         const fullEmailInput = document.getElementById('fullEmail');
