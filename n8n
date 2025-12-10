@@ -2,6 +2,32 @@
   "nodes": [
     {
       "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"error\": true,\n  \"message\": \"Thông tin không hợp lệ\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        16,
+        -192
+      ],
+      "id": "2cc21f20-c69a-4eaf-b5df-5b074bc8f9bd",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        -192
+      ],
+      "id": "8b30f3f3-5b02-415b-9d51-1cdada5ee7ca",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
         "documentId": {
           "__rl": true,
           "value": "1KYVqHXbH1cnVG_rrqrA4-9ny1GFJx1JfW5uj67FpMiM",
@@ -21,14 +47,14 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -32,
+        128,
         192
       ],
-      "id": "c18eb5a7-62ea-4ec7-9609-76115d147079",
+      "id": "7d0821d7-a973-4bb1-82ec-e87635fd8927",
       "name": "Get row(s) in sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "sH2A0n6keNaQT7Um",
+          "id": "IJ7ketXaIkRYomuV",
           "name": "Google Sheets account"
         }
       }
@@ -42,10 +68,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -432,
-        -64
+        -192,
+        -48
       ],
-      "id": "62b6194b-e620-48fc-8141-62110bee8dc1",
+      "id": "e63876c1-97de-4907-9df8-f075d22cc136",
       "name": "Webhook1",
       "webhookId": "52b9988d-9d1e-4c64-832b-6d505e3f3b1e"
     },
@@ -82,10 +108,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        608,
-        -48
+        1232,
+        -32
       ],
-      "id": "633c25dc-02ab-486c-80bb-691f527d62a8",
+      "id": "db9462c8-6d91-4ffa-96c4-c727037666b7",
       "name": "HTTP Request1",
       "retryOnFail": true
     },
@@ -104,16 +130,16 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        -208,
+        -48,
         192
       ],
-      "id": "be6d48fd-b27b-4c19-bdc1-b91a4deb5dce",
+      "id": "2e30c004-3dd9-4703-bb39-663796711889",
       "name": "Download file",
       "executeOnce": false,
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "TKmCUhlqWombaJjt",
-          "name": "Google Drive account 2"
+          "id": "lIrccTwk8CYMu9cc",
+          "name": "Google Drive account"
         }
       }
     },
@@ -122,34 +148,71 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        144,
-        -48
+        560,
+        -32
       ],
-      "id": "39e85108-c648-4461-b8a6-973ed65a4d5f",
+      "id": "c30bf0ea-c6be-4eda-8116-a3cd463232a5",
       "name": "Merge"
     },
     {
       "parameters": {
-        "jsCode": "// Lấy tất cả items\nconst allItems = $input.all();\n\n// Lấy user message từ item đầu tiên\nconst userMessage = allItems[0].json.body.message;\n\n// Lấy data từ Google Sheet (bỏ qua item đầu tiên - webhook)\nconst googleSheetData = allItems.slice(1).map(i => i.json);\n\n// Tạo payload\nconst payload = {\n  model: \"amazon/nova-2-lite-v1:free\",\n  messages: [\n    {\n      role: \"user\",\n      content: `User message: ${userMessage}\n\nĐây là dữ liệu từ Google Sheet và bạn chỉ được trả lời từ nội dung trong đây và nếu người dùng hỏi ngoài nội dung trong đây thì trả lời \"Không hợp lệ\":\n${JSON.stringify(googleSheetData, null, 2)}`\n    }\n  ]\n};\n\nreturn [{ json: payload }];"
+        "jsCode": "const userMessage = $input.first().json.userMessage;\nconst filtered = $input.first().json.results;\nconst totalFound = $input.first().json.totalFound;\n\nconst payload = {\n  model: \"amazon/nova-2-lite-v1:free\",\n  messages: [\n    {\n      role: \"user\",\n      content: `\nNgười dùng hỏi: ${userMessage}\n\nDữ liệu được tìm thấy (${totalFound} kết quả, hiển thị tối đa 20):\n${JSON.stringify(filtered, null, 2)}\n\nBạn chỉ được trả lời dựa trên dữ liệu trên.\nNếu câu hỏi không khớp dữ liệu → trả lời \"Nội dung bạn gửi không hợp lệ\" hoặc \"Bạn cần phải hỏi nội dung về môn học \" ngay lập tức chứ không giải thích lí do hay gì cả.\n`\n    }\n  ]\n};\n\nreturn [{ json: payload }];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        384,
-        -48
+        1008,
+        -32
       ],
-      "id": "f9df8a9c-4773-4416-95e2-9249121fcb8f",
+      "id": "50a28d7f-a807-487e-8b07-32ff8cb33339",
       "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "// JS1 — chỉ xử lý dữ liệu Google Sheet\n// Không đụng gì tới webhook\n\nconst items = $input.all();\n\n// Tự động convert từng row thành chuỗi để AI search sau\nconst processed = items.map(i => {\n  const row = i.json;\n  row._flatString = JSON.stringify(row).toLowerCase(); // thêm 1 trường phục vụ tìm kiếm\n  return { json: row };\n});\n\nreturn processed;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        192
+      ],
+      "id": "8bc340eb-1656-458b-b29b-a33edfec8038",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// Webhook = item đầu tiên\nconst userMessage = items[0].json.body.message.toLowerCase();\n\n// keyword\nconst keywordMatch = userMessage.match(/(nhập môn|cơ sở dữ liệu|lập trình|java|thực hành|đại số|giải tích)/gi);\nconst keyword = keywordMatch ? keywordMatch[0] : userMessage;\n\n// Sheet data (đã có _flatString từ JS1)\nconst sheetData = items.slice(1).map(i => i.json);\n\n// normalize\nfunction normalize(str) {\n  return str\n    .toLowerCase()\n    .normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\");\n}\n\n// lọc\nconst filtered = sheetData.filter(r =>\n  r._flatString && normalize(r._flatString).includes(normalize(keyword))\n);\n\nreturn [{\n  json: {\n    userMessage,\n    keyword,\n    results: filtered.slice(0, 20),\n    totalFound: filtered.length\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        -32
+      ],
+      "id": "41001970-39a0-4fcf-9b56-ca9a538ff978",
+      "name": "Code in JavaScript2"
     }
   ],
   "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Get row(s) in sheet": {
       "main": [
         [
           {
-            "node": "Merge",
+            "node": "Code in JavaScript1",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ]
       ]
@@ -170,11 +233,6 @@
         ]
       ]
     },
-    "HTTP Request1": {
-      "main": [
-        []
-      ]
-    },
     "Download file": {
       "main": [
         [
@@ -190,7 +248,7 @@
       "main": [
         [
           {
-            "node": "Code in JavaScript",
+            "node": "Code in JavaScript2",
             "type": "main",
             "index": 0
           }
@@ -207,11 +265,33 @@
           }
         ]
       ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "pinData": {},
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "941d1cd3fbcf3ae0a5b44c0d386646832139e688803f2b4fb56ed4e54751cb10"
+    "instanceId": "fe592d97760b30915ddde711d60e9a8ed69094554c2d8212edb422f325f8845c"
   }
 }
