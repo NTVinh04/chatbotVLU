@@ -2,6 +2,39 @@
   "nodes": [
     {
       "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1KYVqHXbH1cnVG_rrqrA4-9ny1GFJx1JfW5uj67FpMiM",
+          "mode": "list",
+          "cachedResultName": "n8n-test",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KYVqHXbH1cnVG_rrqrA4-9ny1GFJx1JfW5uj67FpMiM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Trang tính1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KYVqHXbH1cnVG_rrqrA4-9ny1GFJx1JfW5uj67FpMiM/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -32,
+        192
+      ],
+      "id": "c18eb5a7-62ea-4ec7-9609-76115d147079",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "sH2A0n6keNaQT7Um",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
         "httpMethod": "POST",
         "path": "chat-test",
         "options": {}
@@ -9,11 +42,11 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -192,
-        -16
+        -432,
+        -64
       ],
-      "id": "67ea03d0-8d21-4239-b8bc-951d3178e1a6",
-      "name": "Webhook",
+      "id": "62b6194b-e620-48fc-8141-62110bee8dc1",
+      "name": "Webhook1",
       "webhookId": "52b9988d-9d1e-4c64-832b-6d505e3f3b1e"
     },
     {
@@ -43,63 +76,132 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"model\": \"x-ai/grok-4.1-fast:free\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"={{ $json.body.message }}\"\n    }\n  ]\n}\n",
+        "jsonBody": "={{ $json }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        16,
-        -16
+        608,
+        -48
       ],
-      "id": "8b66adca-9bcc-4676-8e09-89d9301e7c93",
-      "name": "HTTP Request",
+      "id": "633c25dc-02ab-486c-80bb-691f527d62a8",
+      "name": "HTTP Request1",
       "retryOnFail": true
     },
     {
-      "parameters": {},
-      "type": "n8n-nodes-base.errorTrigger",
-      "typeVersion": 1,
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1KYVqHXbH1cnVG_rrqrA4-9ny1GFJx1JfW5uj67FpMiM",
+          "mode": "list",
+          "cachedResultName": "n8n-test",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KYVqHXbH1cnVG_rrqrA4-9ny1GFJx1JfW5uj67FpMiM/edit?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
       "position": [
-        -192,
-        -192
+        -208,
+        192
       ],
-      "id": "8b30f3f3-5b02-415b-9d51-1cdada5ee7ca",
-      "name": "Error Trigger"
+      "id": "be6d48fd-b27b-4c19-bdc1-b91a4deb5dce",
+      "name": "Download file",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "TKmCUhlqWombaJjt",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        144,
+        -48
+      ],
+      "id": "39e85108-c648-4461-b8a6-973ed65a4d5f",
+      "name": "Merge"
     },
     {
       "parameters": {
-        "respondWith": "json",
-        "responseBody": "{\n  \"error\": true,\n  \"message\": \"Thông tin không hợp lệ\"\n}",
-        "options": {}
+        "jsCode": "// Lấy tất cả items\nconst allItems = $input.all();\n\n// Lấy user message từ item đầu tiên\nconst userMessage = allItems[0].json.body.message;\n\n// Lấy data từ Google Sheet (bỏ qua item đầu tiên - webhook)\nconst googleSheetData = allItems.slice(1).map(i => i.json);\n\n// Tạo payload\nconst payload = {\n  model: \"amazon/nova-2-lite-v1:free\",\n  messages: [\n    {\n      role: \"user\",\n      content: `User message: ${userMessage}\n\nĐây là dữ liệu từ Google Sheet và bạn chỉ được trả lời từ nội dung trong đây và nếu người dùng hỏi ngoài nội dung trong đây thì trả lời \"Không hợp lệ\":\n${JSON.stringify(googleSheetData, null, 2)}`\n    }\n  ]\n};\n\nreturn [{ json: payload }];"
       },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        16,
-        -192
+        384,
+        -48
       ],
-      "id": "2cc21f20-c69a-4eaf-b5df-5b074bc8f9bd",
-      "name": "Respond to Webhook"
+      "id": "f9df8a9c-4773-4416-95e2-9249121fcb8f",
+      "name": "Code in JavaScript"
     }
   ],
   "connections": {
-    "Webhook": {
+    "Get row(s) in sheet": {
       "main": [
         [
           {
-            "node": "HTTP Request",
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Download file",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Error Trigger": {
+    "HTTP Request1": {
+      "main": [
+        []
+      ]
+    },
+    "Download file": {
       "main": [
         [
           {
-            "node": "Respond to Webhook",
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
             "type": "main",
             "index": 0
           }
@@ -109,6 +211,7 @@
   },
   "pinData": {},
   "meta": {
-    "instanceId": "fe592d97760b30915ddde711d60e9a8ed69094554c2d8212edb422f325f8845c"
+    "templateCredsSetupCompleted": true,
+    "instanceId": "941d1cd3fbcf3ae0a5b44c0d386646832139e688803f2b4fb56ed4e54751cb10"
   }
 }
