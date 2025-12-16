@@ -126,72 +126,6 @@
       "name": "Schedule Trigger"
     },
     {
-      "parameters": {
-        "documentId": {
-          "__rl": true,
-          "value": "1KYVqHXbH1cnVG_rrqrA4-9ny1GFJx1JfW5uj67FpMiM",
-          "mode": "list",
-          "cachedResultName": "n8n-test",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KYVqHXbH1cnVG_rrqrA4-9ny1GFJx1JfW5uj67FpMiM/edit?usp=drivesdk"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "gid=0",
-          "mode": "list",
-          "cachedResultName": "Trang tính1",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KYVqHXbH1cnVG_rrqrA4-9ny1GFJx1JfW5uj67FpMiM/edit#gid=0"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.7,
-      "position": [
-        208,
-        144
-      ],
-      "id": "f6f746ca-bcda-49b2-8d15-83d20c6af615",
-      "name": "Get row(s) in sheet",
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "IJ7ketXaIkRYomuV",
-          "name": "Google Sheets account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "documentId": {
-          "__rl": true,
-          "value": "1KYVqHXbH1cnVG_rrqrA4-9ny1GFJx1JfW5uj67FpMiM",
-          "mode": "list",
-          "cachedResultName": "n8n-test",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KYVqHXbH1cnVG_rrqrA4-9ny1GFJx1JfW5uj67FpMiM/edit?usp=drivesdk"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": 854389373,
-          "mode": "list",
-          "cachedResultName": "Trang tính3",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KYVqHXbH1cnVG_rrqrA4-9ny1GFJx1JfW5uj67FpMiM/edit#gid=854389373"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.7,
-      "position": [
-        208,
-        336
-      ],
-      "id": "3039639d-add9-47d7-b0e3-f79a43afd427",
-      "name": "Get row(s) in sheet1",
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "IJ7ketXaIkRYomuV",
-          "name": "Google Sheets account"
-        }
-      }
-    },
-    {
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
@@ -203,25 +137,14 @@
       "name": "When clicking ‘Execute workflow’"
     },
     {
-      "parameters": {},
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 3.2,
-      "position": [
-        528,
-        176
-      ],
-      "id": "5e663ab8-a196-4882-9687-b9922c8ddf19",
-      "name": "Merge1"
-    },
-    {
       "parameters": {
-        "jsCode": "// items: array các row từ nhiều sheet sau Merge (Append)\n\n// Chuẩn hoá + tạo search index\nconst normalized = items.map(i => {\n  const row = i.json;\n\n  // Gộp toàn bộ giá trị text để search\n  const searchText = Object.values(row)\n    .filter(v => typeof v === 'string' || typeof v === 'number')\n    .join(' ')\n    .toLowerCase();\n\n  return {\n    json: {\n      ...row,\n      _search: searchText\n    }\n  };\n});\n\nreturn normalized;\n"
+        "jsCode": "// items: array các row từ nhiều sheet sau Merge (Append)\n\n// Chuẩn hoá + tạo search index\nconst normalized = items.map(i => {\n  const { row_number, ...rest } = i.json; // bỏ row_number\n\n  // Gộp toàn bộ giá trị text để search\n  const searchText = Object.values(rest)\n    .filter(v => typeof v === 'string' || typeof v === 'number')\n    .join(' ')\n    .toLowerCase();\n\n  return {\n    json: {\n      ...rest,      // không còn row_number\n      _search: searchText\n    }\n  };\n});\n\nreturn normalized;\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        736,
-        176
+        1088,
+        320
       ],
       "id": "f75b18eb-0007-42c4-a77f-4a6efebcbe6e",
       "name": "Code in JavaScript3"
@@ -248,8 +171,8 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "data": "={{ JSON.stringify($input.all().map(i => i.json)) }}",
-            "total": "={{ $input.all().length }}\n",
+            "data": "={{ JSON.stringify($json.data) }}",
+            "total": "={{ $json.total }}",
             "cache_key": "={{ 'sheet_cache' }}"
           },
           "matchingColumns": [],
@@ -293,8 +216,8 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1,
       "position": [
-        1008,
-        176
+        1344,
+        224
       ],
       "id": "5f771581-3c53-452c-a105-0a63d2f25ea1",
       "name": "Upsert row(s)"
@@ -327,6 +250,98 @@
       ],
       "id": "5c6cfdc7-d14e-4fbb-a468-388b8e0213f5",
       "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        608,
+        240
+      ],
+      "id": "21e797d9-1b3f-4970-a92d-8ecaa8e943d3",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "17XCuec_vzvLBH7ZMiFC5PgyrFcL_Rvl1qvbOkUnXXxk",
+          "mode": "list",
+          "cachedResultName": "n8n-test-2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17XCuec_vzvLBH7ZMiFC5PgyrFcL_Rvl1qvbOkUnXXxk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.sheetName }}",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        816,
+        320
+      ],
+      "id": "3039639d-add9-47d7-b0e3-f79a43afd427",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "IJ7ketXaIkRYomuV",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const sheets = items[0].json.sheets || [];\n\nreturn sheets.map(s => ({\n  json: {\n    sheetName: s.properties.title\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        240
+      ],
+      "id": "66bf0a2e-f931-4c70-bce8-0aa51a0aafc6",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Gom toàn bộ items thành 1 item duy nhất\nconst all = items.map(i => i.json);\n\nreturn [\n  {\n    json: {\n      data: all,\n      total: all.length,\n      cache_key: 'sheet_cache'\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        224
+      ],
+      "id": "4d882590-2aa8-43ac-aea9-0a0ed42fbf87",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "url": "https://sheets.googleapis.com/v4/spreadsheets/17XCuec_vzvLBH7ZMiFC5PgyrFcL_Rvl1qvbOkUnXXxk",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        80,
+        240
+      ],
+      "id": "101e3882-857f-461f-8ee4-d99062fe5fef",
+      "name": "HTTP Request",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "IJ7ketXaIkRYomuV",
+          "name": "Google Sheets account"
+        }
+      }
     }
   ],
   "connections": {
@@ -394,36 +409,9 @@
       "main": [
         [
           {
-            "node": "Get row(s) in sheet",
+            "node": "HTTP Request",
             "type": "main",
             "index": 0
-          },
-          {
-            "node": "Get row(s) in sheet1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get row(s) in sheet": {
-      "main": [
-        [
-          {
-            "node": "Merge1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get row(s) in sheet1": {
-      "main": [
-        [
-          {
-            "node": "Merge1",
-            "type": "main",
-            "index": 1
           }
         ]
       ]
@@ -432,23 +420,7 @@
       "main": [
         [
           {
-            "node": "Get row(s) in sheet",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Get row(s) in sheet1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Merge1": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript3",
+            "node": "HTTP Request",
             "type": "main",
             "index": 0
           }
@@ -459,7 +431,7 @@
       "main": [
         [
           {
-            "node": "Upsert row(s)",
+            "node": "Loop Over Items",
             "type": "main",
             "index": 0
           }
@@ -476,6 +448,68 @@
         [
           {
             "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Upsert row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
             "type": "main",
             "index": 0
           }
