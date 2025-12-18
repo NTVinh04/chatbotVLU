@@ -2,24 +2,8 @@
   "nodes": [
     {
       "parameters": {
-        "httpMethod": "POST",
-        "path": "chat-test",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1,
-      "position": [
-        -224,
-        -256
-      ],
-      "id": "e63876c1-97de-4907-9df8-f075d22cc136",
-      "name": "Webhook1",
-      "webhookId": "52b9988d-9d1e-4c64-832b-6d505e3f3b1e"
-    },
-    {
-      "parameters": {
         "method": "POST",
-        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -49,62 +33,39 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        1616,
-        -240
+        944,
+        -384
       ],
-      "id": "db9462c8-6d91-4ffa-96c4-c727037666b7",
+      "id": "633c25dc-02ab-486c-80bb-691f527d62a8",
       "name": "HTTP Request1",
       "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat-test",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -944,
+        -400
+      ],
+      "id": "91b04770-e827-49a5-ad27-f7db8670a953",
+      "name": "Webhook1",
+      "webhookId": "52b9988d-9d1e-4c64-832b-6d505e3f3b1e"
     },
     {
       "parameters": {},
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        944,
-        -240
+        224,
+        -384
       ],
-      "id": "c30bf0ea-c6be-4eda-8116-a3cd463232a5",
+      "id": "022cd629-27c6-4cd7-a9e3-4b6d42c078ee",
       "name": "Merge"
-    },
-    {
-      "parameters": {
-        "jsCode": "const data = $input.first().json;\n\nconst userMessage = data.userMessage;\nconst results = data.results || [];\nconst totalFound = data.totalFound || 0;\n\n// =======================\n// 1. GUARD: KHÔNG CÓ DATA\n// =======================\nif (!totalFound || totalFound === 0) {\n  return [{\n    json: {\n      model: \"llama-3.1-8b-instant\",\n      messages: [\n        {\n          role: \"user\",\n          content: \"Nội dung bạn gửi không hợp lệ\"\n        }\n      ]\n    }\n  }];\n}\n\n// =======================\n// 2. LIMIT DATA (GIẢM TOKEN)\n// =======================\nconst limitedResults = results.slice(0, 5);\n\n// =======================\n// 3. PAYLOAD GROQ\n// =======================\nreturn [{\n  json: {\n    model: \"llama-3.1-8b-instant\",\n    messages: [\n      {\n        role: \"user\",\n        content:\n`Người dùng hỏi: ${userMessage}\n\nDữ liệu tìm thấy (${limitedResults.length} kết quả):\n${JSON.stringify(limitedResults)}\n\nChỉ được trả lời dựa trên dữ liệu trên.\nNếu không khớp trả lời: \"Nội dung bạn gửi không hợp lệ\".`\n      }\n    ]\n  }\n}];\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1392,
-        -240
-      ],
-      "id": "50a28d7f-a807-487e-8b07-32ff8cb33339",
-      "name": "Code in JavaScript"
-    },
-    {
-      "parameters": {
-        "jsCode": "const items = $input.all();\n\n// =======================\n// 1. TÁCH WEBHOOK & CACHE\n// =======================\nconst webhookItem = items.find(\n  i => typeof i.json?.body?.message === 'string'\n);\n\nconst cacheItem = items.find(\n  i => Array.isArray(i.json?.cache)\n);\n\n// Guard: thiếu webhook\nif (!webhookItem) {\n  throw new Error('Không tìm thấy message từ webhook');\n}\n\n// Guard: thiếu cache\nif (!cacheItem) {\n  return [\n    {\n      json: {\n        userMessage: webhookItem.json.body.message,\n        subjectKeyword: '',\n        dayKeyword: '',\n        results: [],\n        totalFound: 0\n      }\n    }\n  ];\n}\n\nconst userMessage = webhookItem.json.body.message.toLowerCase();\nconst sheetData = cacheItem.json.cache;\n\n// =======================\n// 2. TÁCH KEYWORD MÔN HỌC\n// =======================\nconst subjectMatch = userMessage.match(\n  /(nhập môn|cơ sở dữ liệu|lập trình|java|python|thực hành|đại số|giải tích)/gi\n);\n\nconst subjectKeyword = subjectMatch\n  ? subjectMatch[0]\n  : '';\n\n// =======================\n// 3. NORMALIZE\n// =======================\nfunction normalize(str = '') {\n  return str\n    .toString()\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '');\n}\n\nconst normalizedMessage = normalize(userMessage);\nconst normalizedSubject = normalize(subjectKeyword);\n\n// =======================\n// 4. MAP NGÀY HỌC\n// =======================\nconst dayMap = {\n  'thứ hai': 'thứ hai',\n  'thu hai': 'thứ hai',\n  't2': 'thứ hai',\n\n  'thứ ba': 'thứ ba',\n  'thu ba': 'thứ ba',\n  't3': 'thứ ba',\n\n  'thứ tư': 'thứ tư',\n  'thu tu': 'thứ tư',\n  't4': 'thứ tư',\n\n  'thứ năm': 'thứ năm',\n  'thu nam': 'thứ năm',\n  't5': 'thứ năm',\n\n  'thứ sáu': 'thứ sáu',\n  'thu sau': 'thứ sáu',\n  't6': 'thứ sáu',\n\n  'thứ bảy': 'thứ bảy',\n  'thu bay': 'thứ bảy',\n  't7': 'thứ bảy'\n};\n\nlet dayKeyword = '';\n\nfor (const key in dayMap) {\n  if (normalizedMessage.includes(normalize(key))) {\n    dayKeyword = dayMap[key];\n    break;\n  }\n}\n\n// =======================\n// 5. FILTER LẦN 1: THEO MÔN\n// =======================\nconst subjectFiltered = sheetData.filter(row => {\n  if (!row?._search) return false;\n  if (!normalizedSubject) return true;\n\n  return normalize(row._search).includes(normalizedSubject);\n});\n\n// =======================\n// 6. FILTER LẦN 2: THEO NGÀY\n// =======================\nconst finalFiltered = dayKeyword\n  ? subjectFiltered.filter(row =>\n      normalize(row._search).includes(normalize(dayKeyword))\n    )\n  : subjectFiltered;\n\n// =======================\n// 7. RETURN\n// =======================\nreturn [\n  {\n    json: {\n      userMessage,\n      subjectKeyword,\n      dayKeyword,\n      results: finalFiltered.slice(0, 20),\n      totalFound: finalFiltered.length\n    }\n  }\n];\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1168,
-        -240
-      ],
-      "id": "41001970-39a0-4fcf-9b56-ca9a538ff978",
-      "name": "Code in JavaScript2"
-    },
-    {
-      "parameters": {
-        "jsCode": "if (!$input.first()?.json?.data) {\n  throw new Error('Cache chưa được khởi tạo. Hãy chạy workflow cache trước.');\n}\n\nlet cache;\ntry {\n  cache = JSON.parse($input.first().json.data);\n} catch (e) {\n  throw new Error('Cache bị lỗi JSON.');\n}\n\nreturn [\n  {\n    json: {\n      cache,\n      total: $input.first().json.total,\n      updatedAt: $input.first().json.updatedAt\n    }\n  }\n];\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        432,
-        -32
-      ],
-      "id": "4df003cc-b0da-461e-a3ea-27a319f30174",
-      "name": "Code in JavaScript1"
     },
     {
       "parameters": {
@@ -119,10 +80,10 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.3,
       "position": [
-        -240,
-        144
+        -960,
+        16
       ],
-      "id": "d142cc0f-d65b-4f9c-98bf-5432c55cbffb",
+      "id": "2b668d04-3a5f-4eae-ae1c-2ce513a3a1ca",
       "name": "Schedule Trigger"
     },
     {
@@ -130,34 +91,21 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -240,
-        384
+        -960,
+        256
       ],
-      "id": "c536a84c-5e7d-4bc6-993e-c61d1aec2a16",
+      "id": "72a88e1f-d6ee-4d9c-8a4e-0ace7b66bc67",
       "name": "When clicking ‘Execute workflow’"
-    },
-    {
-      "parameters": {
-        "jsCode": "// items: array các row từ nhiều sheet sau Merge (Append)\n\n// Chuẩn hoá + tạo search index\nconst normalized = items.map(i => {\n  const { row_number, ...rest } = i.json; // bỏ row_number\n\n  // Gộp toàn bộ giá trị text để search\n  const searchText = Object.values(rest)\n    .filter(v => typeof v === 'string' || typeof v === 'number')\n    .join(' ')\n    .toLowerCase();\n\n  return {\n    json: {\n      ...rest,      // không còn row_number\n      _search: searchText\n    }\n  };\n});\n\nreturn normalized;\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1088,
-        320
-      ],
-      "id": "f75b18eb-0007-42c4-a77f-4a6efebcbe6e",
-      "name": "Code in JavaScript3"
     },
     {
       "parameters": {
         "operation": "upsert",
         "dataTableId": {
           "__rl": true,
-          "value": "srL4d3lQy5f8UCV1",
+          "value": "U1IDIwYQE0LWuOqS",
           "mode": "list",
           "cachedResultName": "sheet_cache",
-          "cachedResultUrl": "/projects/vBeG3fbFFxc8Ej4R/datatables/srL4d3lQy5f8UCV1"
+          "cachedResultUrl": "/projects/sxDDPKfBS5xOrcGY/datatables/U1IDIwYQE0LWuOqS"
         },
         "matchType": "allConditions",
         "filters": {
@@ -216,10 +164,10 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1,
       "position": [
-        1344,
-        224
+        624,
+        96
       ],
-      "id": "5f771581-3c53-452c-a105-0a63d2f25ea1",
+      "id": "399fc0f5-32b7-4da3-bd84-f7e48961139e",
       "name": "Upsert row(s)"
     },
     {
@@ -227,10 +175,10 @@
         "operation": "get",
         "dataTableId": {
           "__rl": true,
-          "value": "srL4d3lQy5f8UCV1",
+          "value": "U1IDIwYQE0LWuOqS",
           "mode": "list",
           "cachedResultName": "sheet_cache",
-          "cachedResultUrl": "/projects/vBeG3fbFFxc8Ej4R/datatables/srL4d3lQy5f8UCV1"
+          "cachedResultUrl": "/projects/sxDDPKfBS5xOrcGY/datatables/U1IDIwYQE0LWuOqS"
         },
         "matchType": "allConditions",
         "filters": {
@@ -245,10 +193,10 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1,
       "position": [
-        112,
-        -16
+        -608,
+        -144
       ],
-      "id": "5c6cfdc7-d14e-4fbb-a468-388b8e0213f5",
+      "id": "8005f100-9f3b-4bec-94b3-0052252a5223",
       "name": "Get row(s)"
     },
     {
@@ -258,10 +206,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        608,
-        240
+        -112,
+        112
       ],
-      "id": "21e797d9-1b3f-4970-a92d-8ecaa8e943d3",
+      "id": "4188648c-a395-40e1-acc4-cac6e1ada7d8",
       "name": "Loop Over Items"
     },
     {
@@ -283,17 +231,34 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        816,
-        320
+        96,
+        192
       ],
-      "id": "3039639d-add9-47d7-b0e3-f79a43afd427",
+      "id": "8a778315-1e24-48f1-9ecd-e35677456c3e",
       "name": "Get row(s) in sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "IJ7ketXaIkRYomuV",
+          "id": "sH2A0n6keNaQT7Um",
           "name": "Google Sheets account"
         }
       }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -960,
+        528
+      ],
+      "id": "9c325e28-13bb-4ece-a794-9f753249ed74",
+      "name": "Schedule Trigger1"
     },
     {
       "parameters": {
@@ -302,24 +267,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        352,
-        240
+        -368,
+        496
       ],
-      "id": "66bf0a2e-f931-4c70-bce8-0aa51a0aafc6",
-      "name": "Code in JavaScript4"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Gom toàn bộ items thành 1 item duy nhất\nconst all = items.map(i => i.json);\n\nreturn [\n  {\n    json: {\n      data: all,\n      total: all.length,\n      cache_key: 'sheet_cache'\n    }\n  }\n];\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        960,
-        224
-      ],
-      "id": "4d882590-2aa8-43ac-aea9-0a0ed42fbf87",
-      "name": "Code in JavaScript5"
+      "id": "4f719332-c5ee-4ede-b314-d7c2d42d9088",
+      "name": "sheetName"
     },
     {
       "parameters": {
@@ -331,20 +283,259 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        80,
-        240
+        -640,
+        112
       ],
-      "id": "101e3882-857f-461f-8ee4-d99062fe5fef",
-      "name": "HTTP Request",
+      "id": "420b9152-0b57-48ef-bd07-2d394d1b4ea3",
+      "name": "sheetK28",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "IJ7ketXaIkRYomuV",
+          "id": "sH2A0n6keNaQT7Um",
           "name": "Google Sheets account"
         }
       }
+    },
+    {
+      "parameters": {
+        "url": "https://sheets.googleapis.com/v4/spreadsheets/1KYVqHXbH1cnVG_rrqrA4-9ny1GFJx1JfW5uj67FpMiM",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -624,
+        496
+      ],
+      "id": "4c7ae156-5f12-4911-9ded-031a98c55a55",
+      "name": "sheetCTDT",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "sH2A0n6keNaQT7Um",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// =======================\n// 1. TÁCH WEBHOOK & CACHE\n// =======================\nconst webhookItem = items.find(\n  i => typeof i.json?.body?.message === 'string'\n);\n\nconst cacheItem = items.find(\n  i => Array.isArray(i.json?.cache)\n);\n\n// Guard: thiếu webhook\nif (!webhookItem) {\n  throw new Error('Không tìm thấy message từ webhook');\n}\n\n// Guard: thiếu cache\nif (!cacheItem) {\n  return [\n    {\n      json: {\n        userMessage: webhookItem.json.body.message,\n        subjectKeyword: '',\n        dayKeyword: '',\n        results: [],\n        totalFound: 0\n      }\n    }\n  ];\n}\n\nconst userMessage = webhookItem.json.body.message.toLowerCase();\nconst sheetData = cacheItem.json.cache;\n\n// =======================\n// 2. TÁCH KEYWORD MÔN HỌC\n// =======================\nconst subjectMatch = userMessage.match(\n  /(nhập môn|cơ sở dữ liệu|lập trình|java|python|thực hành|đại số|giải tích)/gi\n);\n\nconst subjectKeyword = subjectMatch\n  ? subjectMatch[0]\n  : '';\n\n// =======================\n// 3. NORMALIZE\n// =======================\nfunction normalize(str = '') {\n  return str\n    .toString()\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '');\n}\n\nconst normalizedMessage = normalize(userMessage);\nconst normalizedSubject = normalize(subjectKeyword);\n\n// =======================\n// 4. MAP NGÀY HỌC\n// =======================\nconst dayMap = {\n  'thứ hai': 'thứ hai',\n  'thu hai': 'thứ hai',\n  't2': 'thứ hai',\n\n  'thứ ba': 'thứ ba',\n  'thu ba': 'thứ ba',\n  't3': 'thứ ba',\n\n  'thứ tư': 'thứ tư',\n  'thu tu': 'thứ tư',\n  't4': 'thứ tư',\n\n  'thứ năm': 'thứ năm',\n  'thu nam': 'thứ năm',\n  't5': 'thứ năm',\n\n  'thứ sáu': 'thứ sáu',\n  'thu sau': 'thứ sáu',\n  't6': 'thứ sáu',\n\n  'thứ bảy': 'thứ bảy',\n  'thu bay': 'thứ bảy',\n  't7': 'thứ bảy'\n};\n\nlet dayKeyword = '';\n\nfor (const key in dayMap) {\n  if (normalizedMessage.includes(normalize(key))) {\n    dayKeyword = dayMap[key];\n    break;\n  }\n}\n\n// =======================\n// 5. FILTER LẦN 1: THEO MÔN\n// =======================\nconst subjectFiltered = sheetData.filter(row => {\n  if (!row?._search) return false;\n  if (!normalizedSubject) return true;\n\n  return normalize(row._search).includes(normalizedSubject);\n});\n\n// =======================\n// 6. FILTER LẦN 2: THEO NGÀY\n// =======================\nconst finalFiltered = dayKeyword\n  ? subjectFiltered.filter(row =>\n      normalize(row._search).includes(normalize(dayKeyword))\n    )\n  : subjectFiltered;\n\n// =======================\n// 7. RETURN\n// =======================\nreturn [\n  {\n    json: {\n      userMessage,\n      subjectKeyword,\n      dayKeyword,\n      results: finalFiltered.slice(0, 20),\n      totalFound: finalFiltered.length\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        -384
+      ],
+      "id": "9ba4d1c0-7b49-48d8-b2d6-79892eb2c8fe",
+      "name": "normalFilter"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nconst userMessage = data.userMessage;\nconst results = data.results || [];\nconst totalFound = data.totalFound || 0;\n\n// =======================\n// 1. GUARD: KHÔNG CÓ DATA\n// =======================\nif (!totalFound || totalFound === 0) {\n  return [{\n    json: {\n      model: \"llama-3.1-8b-instant\",\n      messages: [\n        {\n          role: \"user\",\n          content: \"Nội dung bạn gửi không hợp lệ\"\n        }\n      ]\n    }\n  }];\n}\n\n// =======================\n// 2. LIMIT DATA (GIẢM TOKEN)\n// =======================\nconst limitedResults = results.slice(0, 5);\n\n// =======================\n// 3. PAYLOAD GROQ\n// =======================\nreturn [{\n  json: {\n    model: \"llama-3.1-8b-instant\",\n    messages: [\n      {\n        role: \"user\",\n        content:\n`Người dùng hỏi: ${userMessage}\n\nDữ liệu tìm thấy (${limitedResults.length} kết quả):\n${JSON.stringify(limitedResults)}\n\nChỉ được trả lời dựa trên dữ liệu trên.\nNếu không khớp trả lời: \"Nội dung bạn gửi không hợp lệ\".`\n      }\n    ]\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        -384
+      ],
+      "id": "373e7d81-8dd3-46ac-ac4b-b8eaf737eee7",
+      "name": "aiInput"
+    },
+    {
+      "parameters": {
+        "jsCode": "if (!$input.first()?.json?.data) {\n  throw new Error('Cache chưa được khởi tạo. Hãy chạy workflow cache trước.');\n}\n\nlet cache;\ntry {\n  cache = JSON.parse($input.first().json.data);\n} catch (e) {\n  throw new Error('Cache bị lỗi JSON.');\n}\n\nreturn [\n  {\n    json: {\n      cache,\n      total: $input.first().json.total,\n      updatedAt: $input.first().json.updatedAt\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -288,
+        -160
+      ],
+      "id": "1f2601fd-6e3f-4772-b320-118c9f182edc",
+      "name": "tableInfo"
+    },
+    {
+      "parameters": {
+        "jsCode": "// items: array các row từ nhiều sheet sau Merge (Append)\n\n// Chuẩn hoá + tạo search index\nconst normalized = items.map(i => {\n  const { row_number, ...rest } = i.json; // bỏ row_number\n\n  // Gộp toàn bộ giá trị text để search\n  const searchText = Object.values(rest)\n    .filter(v => typeof v === 'string' || typeof v === 'number')\n    .join(' ')\n    .toLowerCase();\n\n  return {\n    json: {\n      ...rest,      // không còn row_number\n      _search: searchText\n    }\n  };\n});\n\nreturn normalized;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        192
+      ],
+      "id": "177785ed-5120-4975-b0c1-9b8dbd3db180",
+      "name": "normal"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Gom toàn bộ items thành 1 item duy nhất\nconst all = items.map(i => i.json);\n\nreturn [\n  {\n    json: {\n      data: all,\n      total: all.length,\n      cache_key: 'sheet_cache'\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        96
+      ],
+      "id": "76b30001-351b-4704-a497-f3122b4c1252",
+      "name": "mergeItem"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sheets = items[0].json.sheets || [];\n\nreturn sheets.map(s => ({\n  json: {\n    sheetName: s.properties.title\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        112
+      ],
+      "id": "feb7d538-5a9b-4453-80b7-f34e4ac81f83",
+      "name": "sheetName1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -64,
+        496
+      ],
+      "id": "bdfd91b3-0ae4-41e1-aed8-7e03aaec2aac",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1KYVqHXbH1cnVG_rrqrA4-9ny1GFJx1JfW5uj67FpMiM",
+          "mode": "list",
+          "cachedResultName": "n8n-test",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KYVqHXbH1cnVG_rrqrA4-9ny1GFJx1JfW5uj67FpMiM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.sheetName }}",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        144,
+        576
+      ],
+      "id": "9bb6bf94-46e3-4615-a9a9-352381ac1fe2",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "sH2A0n6keNaQT7Um",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// =======================\n// INPUT\n// =======================\nconst rows = items.map(i => i.json);\n\n// =======================\n// CONFIG CỐ ĐỊNH\n// =======================\nconst MAJOR = 'CNTT';\nconst KHOA = 'K28';\n\n// =======================\n// PHÂN BIỆT SHEET\n// =======================\nconst khungRows = rows.filter(r => r['HỌC KỲ'] || r['Mã HP']);\nconst detailRows = rows.filter(r => r['Mục tiêu học phần']);\n\n// =======================\n// 1. BUILD MAP CHI TIẾT HP\n// =======================\nconst detailMap = {};\n\nfor (const r of detailRows) {\n  if (!r['Mã HP']) continue;\n\n  detailMap[r['Mã HP']] = {\n    muc_tieu: r['Mục tiêu học phần'] || '',\n    noi_dung: r['Nội dung học phần'] || ''\n  };\n}\n\n// =======================\n// 2. PARSE KHUNG CTĐT\n// =======================\nlet currentSemester = null;\nlet currentGroup = null;\n\nconst curriculum = [];\n\nfor (const r of khungRows) {\n\n  // ---- DÒNG HỌC KỲ ----\n  if (r['HỌC KỲ'] && r['HỌC KỲ'].toString().includes('Học kỳ')) {\n    currentSemester = Number(\n      r['HỌC KỲ'].toString().replace(/[^0-9]/g, '')\n    );\n    continue;\n  }\n\n  // ---- DÒNG NHÓM KIẾN THỨC ----\n  if (r['NHÓM KIẾN THỨC'] && !r['Mã HP']) {\n    currentGroup = r['NHÓM KIẾN THỨC'];\n    continue;\n  }\n\n  // ---- DÒNG MÔN HỌC ----\n  if (r['Mã HP'] && r['Tên học phần']) {\n\n    const detail = detailMap[r['Mã HP']] || {};\n\n    curriculum.push({\n      major: MAJOR,\n      khoa: KHOA,\n      hoc_ky: currentSemester,\n      ma_mon: r['Mã HP'],\n      ten_mon: r['Tên học phần'],\n      nhom_kien_thuc: currentGroup,\n      bat_buoc: r['BB/TC'] === 'BB',\n      tien_quyet: r['Tiên quyết'] || '',\n      muc_tieu: detail.muc_tieu || '',\n      noi_dung: detail.noi_dung || '',\n\n      _search: [\n        r['Mã HP'],\n        r['Tên học phần'],\n        currentGroup,\n        `học kỳ ${currentSemester}`,\n        detail.muc_tieu\n      ]\n        .filter(Boolean)\n        .join(' ')\n        .toLowerCase()\n    });\n  }\n}\n\n// =======================\n// OUTPUT\n// =======================\nreturn curriculum.map(c => ({ json: c }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        576
+      ],
+      "id": "27699c9a-a0cd-4198-bcc3-7eb3ab48281e",
+      "name": "normal1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Gom toàn bộ curriculum rows thành 1 object cache\nconst all = items.map(i => i.json);\n\nreturn [\n  {\n    json: {\n      cache_key: 'curriculum_cache',\n      data: all,\n      total: all.length,\n      updatedAt: new Date().toISOString()\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        480
+      ],
+      "id": "5f2e872a-6868-4f90-9604-8b58a39ceb29",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "U1IDIwYQE0LWuOqS",
+          "mode": "list",
+          "cachedResultName": "sheet_cache",
+          "cachedResultUrl": "/projects/sxDDPKfBS5xOrcGY/datatables/U1IDIwYQE0LWuOqS"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "cache_key": "={{ 'curriculum_cache' }}",
+            "total": "={{ $json.total }}",
+            "data": "={{ JSON.stringify($json.data) }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "cache_key",
+              "displayName": "cache_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "total",
+              "displayName": "total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        560,
+        480
+      ],
+      "id": "0fe15d59-3867-4107-9a12-effd8f4bf11f",
+      "name": "Upsert row(s)1"
     }
   ],
   "connections": {
+    "HTTP Request1": {
+      "main": [
+        []
+      ]
+    },
     "Webhook1": {
       "main": [
         [
@@ -365,42 +556,9 @@
       "main": [
         [
           {
-            "node": "Code in JavaScript2",
+            "node": "normalFilter",
             "type": "main",
             "index": 0
-          }
-        ]
-      ]
-    },
-    "Code in JavaScript": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code in JavaScript2": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code in JavaScript1": {
-      "main": [
-        [
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 1
           }
         ]
       ]
@@ -409,7 +567,7 @@
       "main": [
         [
           {
-            "node": "HTTP Request",
+            "node": "sheetK28",
             "type": "main",
             "index": 0
           }
@@ -420,34 +578,23 @@
       "main": [
         [
           {
-            "node": "HTTP Request",
+            "node": "sheetK28",
             "type": "main",
             "index": 0
-          }
-        ]
-      ]
-    },
-    "Code in JavaScript3": {
-      "main": [
-        [
+          },
           {
-            "node": "Loop Over Items",
+            "node": "sheetCTDT",
             "type": "main",
             "index": 0
           }
         ]
-      ]
-    },
-    "Upsert row(s)": {
-      "main": [
-        []
       ]
     },
     "Get row(s)": {
       "main": [
         [
           {
-            "node": "Code in JavaScript1",
+            "node": "tableInfo",
             "type": "main",
             "index": 0
           }
@@ -458,7 +605,7 @@
       "main": [
         [
           {
-            "node": "Code in JavaScript5",
+            "node": "mergeItem",
             "type": "main",
             "index": 0
           }
@@ -476,14 +623,91 @@
       "main": [
         [
           {
-            "node": "Code in JavaScript3",
+            "node": "normal",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Code in JavaScript4": {
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "sheetCTDT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sheetName": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sheetK28": {
+      "main": [
+        [
+          {
+            "node": "sheetName1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sheetCTDT": {
+      "main": [
+        [
+          {
+            "node": "sheetName",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "normalFilter": {
+      "main": [
+        [
+          {
+            "node": "aiInput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "aiInput": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tableInfo": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "normal": {
       "main": [
         [
           {
@@ -494,7 +718,7 @@
         ]
       ]
     },
-    "Code in JavaScript5": {
+    "mergeItem": {
       "main": [
         [
           {
@@ -505,11 +729,62 @@
         ]
       ]
     },
-    "HTTP Request": {
+    "sheetName1": {
       "main": [
         [
           {
-            "node": "Code in JavaScript4",
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "normal1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "normal1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Upsert row(s)1",
             "type": "main",
             "index": 0
           }
@@ -520,6 +795,6 @@
   "pinData": {},
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "fe592d97760b30915ddde711d60e9a8ed69094554c2d8212edb422f325f8845c"
+    "instanceId": "941d1cd3fbcf3ae0a5b44c0d386646832139e688803f2b4fb56ed4e54751cb10"
   }
 }
